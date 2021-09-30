@@ -2,7 +2,14 @@
 
 """The setup script."""
 
+import os
+
 from setuptools import find_packages, setup
+
+custom_package_path = os.path.join(
+    os.getcwd(), "packages", "unityagents-0.4.0-py3-none-any.whl"
+)
+
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -12,6 +19,7 @@ with open("HISTORY.rst") as history_file:
 
 requirements = [
     "Click>=7.1.2",
+    f"unityagents @ file://localhost/{custom_package_path}",
 ]
 
 test_requirements = [
@@ -21,7 +29,7 @@ test_requirements = [
 setup(
     author="Juan Carlos Calvo Jackson",
     author_email="juancarlos.calvo@quantumblack.com",
-    python_requires="==3.6",
+    python_requires="~=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
