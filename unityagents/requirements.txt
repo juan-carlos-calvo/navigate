@@ -1,0 +1,6 @@
+tensorflow>=1.14,<2.0
+numpy>=1.11.0
+pytest>=3.2.2
+docopt
+protobuf
+torch

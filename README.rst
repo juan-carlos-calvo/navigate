@@ -3,9 +3,6 @@ navigate
 ========
 
 
-.. image:: https://img.shields.io/pypi/v/navigate.svg
-        :target: https://pypi.python.org/pypi/navigate
-
 .. image:: https://img.shields.io/travis/juan-carlos-calvo/navigate.svg
         :target: https://travis-ci.com/juan-carlos-calvo/navigate
 
