@@ -1,0 +1,16 @@
+[default.buffer.kwargs]
+buffer_size = 100000
+batch_size = 64
+
+[default.agent]
+gamma = 0.99
+tau = 0.001
+lr = 0.0005
+update_every = 4
+
+[default.qmodel.kwargs]
+fc1_units = 64
+fc2_units = 64
+
+[default.qmodel]
+class_name = "navigate.QNetwork"

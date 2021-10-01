@@ -20,6 +20,7 @@ with open("HISTORY.rst") as history_file:
 requirements = [
     "Click>=7.1.2",
     f"unityagents @ file://localhost/{custom_package_path}",
+    "dynaconf~=3.1.7",
 ]
 
 test_requirements = [
@@ -38,7 +39,11 @@ setup(
         "Programming Language :: Python :: 3.6",
     ],
     description="Udacity's first project basic implementation from scratch",
-    entry_points={"console_scripts": ["navigate=navigate.cli:main",],},
+    entry_points={
+        "console_scripts": [
+            "navigate=navigate.cli:main",
+        ],
+    },
     install_requires=requirements,
     license="MIT license",
     long_description=readme + "\n\n" + history,
