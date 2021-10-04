@@ -1,5 +1,6 @@
 import random
 from collections import deque, namedtuple
+from typing import Any
 
 import numpy as np
 import torch
@@ -13,16 +14,13 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 class Agent:
-    """Interacts with and learns from the environment."""
+    def __init__(self, env: Any, seed: int = 0):
+        """Interacts with and learns from the environment.
 
-    def __init__(self, env, seed: int = 0):
-        """Initialize an Agent object.
-
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
+        Args:
+            env (Any): environment. Must have step and reset methods,
+            as well action_size and space_size properties.
+            seed (int, optional): random seed. Defaults to 0.
         """
         self.env = env
         self.seed = random.seed(seed)
@@ -45,6 +43,16 @@ class Agent:
         self.t_step = 0
 
     def step(self, state, action, reward, next_state, done):
+        """add experience to buffer and train on a batch if
+        the internal step counter is 0 mod `update_every`
+
+        Args:
+            state ([type]): [description]
+            action ([type]): [description]
+            reward ([type]): [description]
+            next_state ([type]): [description]
+            done (function): [description]
+        """
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
 
@@ -123,8 +131,21 @@ class Agent:
                 tau * local_param.data + (1.0 - tau) * target_param.data
             )
 
-    def learn(
-        self, n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.995
+    def play(self, n_episodes: int = 3, mat_t: int = 1000):
+        eps_start = 0
+        eps_end = 0
+        train_mode = False
+        self._interact(n_episodes, mat_t, eps_start, eps_end, train_mode=train_mode)
+
+    def _interact(
+        self,
+        n_episodes=2000,
+        max_t=1000,
+        eps_start=1.0,
+        eps_end=0.01,
+        eps_decay=0.995,
+        model_save_path: str = "checkpoint.pth",
+        train_mode: bool = True,
     ):
         """Deep Q-Learning.
 
@@ -140,12 +161,13 @@ class Agent:
         scores_window = deque(maxlen=100)  # last 100 scores
         eps = eps_start  # initialize epsilon
         for i_episode in range(1, n_episodes + 1):
-            state = self.env.reset()
+            state = self.env.reset(train_mode=train_mode)
             score = 0
             for t in range(max_t):
                 action = self.act(state, eps)
                 next_state, reward, done, _ = self.env.step(action)
-                self.step(state, action, reward, next_state, done)
+                if train_mode:
+                    self.step(state, action, reward, next_state, done)
                 state = next_state
                 score += reward
                 if done:
@@ -165,15 +187,38 @@ class Agent:
                         i_episode, np.mean(scores_window)
                     )
                 )
-            if np.mean(scores_window) >= 200.0:
-                print(
-                    "\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}".format(
-                        i_episode - 100, np.mean(scores_window)
-                    )
-                )
-                torch.save(self.qnetwork_local.state_dict(), "checkpoint.pth")
-                break
+        if train_mode:
+            torch.save(self.qnetwork_local.state_dict(), model_save_path)
         return score
+
+    def learn(
+        self,
+        n_episodes=2000,
+        max_t=1000,
+        eps_start=1.0,
+        eps_end=0.01,
+        eps_decay=0.995,
+        model_save_path: str = "checkpoint.pth",
+    ):
+        """Deep Q-Learning.
+
+        Params
+        ======
+            n_episodes (int): maximum number of training episodes
+            max_t (int): maximum number of timesteps per episode
+            eps_start (float): starting value of epsilon, for epsilon-greedy action selection
+            eps_end (float): minimum value of epsilon
+            eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
+        """
+        self._interact(
+            n_episodes,
+            max_t,
+            eps_start,
+            eps_end,
+            eps_decay,
+            model_save_path,
+            train_mode=True,
+        )
 
 
 class ReplayBuffer:
@@ -208,7 +253,8 @@ class ReplayBuffer:
     def sample(self):
         """Randomly sample a batch of experiences from memory."""
         experiences = random.sample(self.memory, k=self.batch_size)
-        return tuple(map(iter2tensor, zip(*experiences)))
+        fields = experiences[0]._fields
+        return tuple(map(iter2tensor, zip(fields, zip(*experiences))))
 
     def __len__(self):
         """Return the current size of internal memory."""
@@ -216,4 +262,6 @@ class ReplayBuffer:
 
 
 def iter2tensor(iter):
-    return torch.from_numpy(np.vstack(iter)).float().to(device)
+    field, arr = iter
+    dtype = "long" if field == "action" else "float"
+    return getattr(torch.from_numpy(np.vstack(arr)), dtype)().to(device)
