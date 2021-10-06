@@ -21,7 +21,7 @@ with open("HISTORY.rst") as history_file:
 requirements = [
     "Click>=7.1.2",
     f"unityagents @ file://localhost/{custom_package_path}",
-    "dynaconf~=3.1.7",
+    "dynaconf~=3.1.5",
     "PIL>=8.3.2",
     "mlflow~=1.20.2",
 ]
