@@ -6,8 +6,9 @@ import os
 
 from setuptools import find_packages, setup
 
+cwd = os.environ.get("CWD") or os.getcwd()
 custom_package_path = os.path.join(
-    os.getcwd(), "packages", "unityagents-0.4.0-py3-none-any.whl"
+    cwd, "packages", "unityagents-0.4.0-py3-none-any.whl"
 )
 
 
