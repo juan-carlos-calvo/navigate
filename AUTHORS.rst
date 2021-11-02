@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Juan Carlos Calvo Jackson <juancarlos.calvo@quantumblack.com>
+* Juan Carlos Calvo Jackson <juancarlos.calvojackson@gmail.com>
 
 Contributors
 ------------

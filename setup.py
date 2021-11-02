@@ -22,8 +22,9 @@ requirements = [
     "Click>=7.1.2",
     f"unityagents @ file://localhost/{custom_package_path}",
     "dynaconf~=3.1.5",
-    "PIL>=8.3.2",
+    "Pillow>=8.3.2",
     "mlflow~=1.20.2",
+    "torch~=1.9.1",
 ]
 
 test_requirements = [
@@ -32,7 +33,7 @@ test_requirements = [
 
 setup(
     author="Juan Carlos Calvo Jackson",
-    author_email="juancarlos.calvo@quantumblack.com",
+    author_email="juancarlos.calvojackson@gmail.com",
     python_requires="~=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
